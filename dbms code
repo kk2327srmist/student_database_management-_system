@@ -1,0 +1,266 @@
+Create table student_reg(reg_id number(10) UNIQUE,reg_name varchar(30) ,stud_id number(10),staff_id number(10), PRIMARY KEY(stud_id));
+Create table student (stud_id number(10) NOT NULL,stfname varchar(30) NOT NULL,stlname varchar(30) NOT NULL,stcourse varchar(30),styear number(10) NOT NULL,stcontact number(11) NOT NULL,st_age number(10),stgender varchar(10),PRIMARY KEY(stud_id));
+Create table staff(staff_id number(10),fname varchar(30) NOT NULL,lname varchar(30) NOT NULL,contact number(11),address varchar(300),gender varchar(10),PRIMARY KEY(staff_id));
+Create table staff_Department(staff_id number(10),course_line number(10),FOREIGN KEY(staff_id) REFERENCES staff(staff_id));
+Create table Courses_offered(course_id number(10),staff_id number(10),course_desc varchar(300),units number(10),course_remarks varchar(300),FOREIGN KEY (staff_id) references staff(staff_id));
+
+ 
+insert into student_reg values(1,'ENROLLEMENT',1,01);
+insert into student_reg values(2,'ENROLLEMENT',2,01);
+insert into student_reg values(3,'ENROLLEMENT',3,01);
+insert into student_reg values(4,'ENROLLEMENT',4,02);
+insert into student_reg values(5,'ENROLLEMENT',5,03);
+insert into student_reg values(6,'ENROLLEMENT',6,04);
+insert into student_reg values(7,'ENROLLEMENT',7,04);
+desc student_reg;
+select * from student_reg ;
+
+select * from student_reg where staff_id=01;
+select * from student_reg where staff_id in 04;
+select * from student_reg order by reg_id desc;
+select * from student_reg where reg_id between 4 and 7;
+
+
+insert into student values (1,'yashwanth','kuppuri','CSBS',2,9999999,19,'male');
+insert into student values (2,'somasekhar','andluri','CSBS',2,9999999,19,'male');
+insert into student values (3,'rohit','rajesh','CSBS',2,9999999,20,'male');
+insert into student values (4,'rhea','peter','AIML',2,9999999,18,'female');
+insert into student values (5,'rajan','benisha','AIML',3,9999999,19,'female');
+insert into student values (6,'karen','raj','CSBS',3,9999999,19,'male');
+insert into student values (7,'vishal','n','CSBS',3,9999999,20,'male');
+desc student;
+select * from student;
+select * from student where stcourse='CSBS' AND styear=2;
+select * from student where stcourse in ('AIML');
+select * from student where stfname like 'r%';
+select * from student order by st_age;
+select * from student where stgender ='male';
+
+insert into staff values(01,'jeba','sonia',888888888,'chennai','female');
+insert into staff values(02,'sheeba','james',888888888,'tamabaram','female');
+insert into staff values(03,'lakshmi','m',9997977,'chengalpattu','female');
+insert into staff values(04,'prasksh','om',888888888,'chennai','male');
+insert into staff values(05,'jeeva','s',888888888,'chennai','male');
+insert into staff values(06,'jayaraj','r',87787878,'medavakam','male');
+desc staff;
+select * from staff;
+select * from staff where address in ('chennai');
+select * from staff order by staff_id desc;
+select * from staff where lname like '%s';
+select * from staff where gender<>'male';
+select * from staff where fname like 'j%';
+
+insert into staff_Department values (01,01);
+insert into staff_Department values (01,02);
+insert into staff_Department values (02,01);
+insert into staff_Department values (03,01);
+insert into staff_Department values (04,01);
+insert into staff_Department values (05,01);
+insert into staff_Department values (06,01);
+select * from staff_Department;
+select * from staff_Department order by staff_id;
+desc staff_department;
+
+insert into Courses_offered values(3,02,'description',50,'NULL');
+insert into Courses_offered values(1,01,'description',50,'NULL');
+insert into Courses_offered values(4,04,'description',50,'NULL');
+insert into Courses_offered values(6,05,'description',50,'NULL');
+insert into Courses_offered values(2,03,'description',50,'NULL');
+insert into Courses_offered values(5,06,'description',50,'NULL');
+
+select * from Courses_offered;
+select * from Courses_offered order by course_id desc;
+select * from Courses_offered where course_remarks='NULL' ;
+desc Courses_offered;
+
+
+
+Create table student_reg(reg_id number(10) UNIQUE,reg_name varchar(30) ,stud_id number(10),staff_id number(10), PRIMARY KEY(stud_id));
+ 
+insert into student_reg values(1,'ENROLLEMENT',1,01);
+insert into student_reg values(2,'ENROLLEMENT',2,01);
+insert into student_reg values(3,'ENROLLEMENT',3,01);
+insert into student_reg values(4,'ENROLLEMENT',4,02);
+insert into student_reg values(5,'ENROLLEMENT',5,03);
+insert into student_reg values(6,'ENROLLEMENT',6,04);
+insert into student_reg values(7,'ENROLLEMENT',7,04);
+
+DECLARE
+  v_reg_id NUMBER(10) := 1;
+  v_reg_name VARCHAR(30) := 'John Doe';
+  v_stud_id NUMBER(10) := 1001;
+  v_staff_id NUMBER(10) := 2001;
+BEGIN
+  INSERT INTO student_reg(reg_id, reg_name, stud_id, staff_id)
+  VALUES (v_reg_id, v_reg_name, v_stud_id, v_staff_id);
+  
+  DBMS_OUTPUT.PUT_LINE('Registration record inserted successfully.');
+EXCEPTION
+  WHEN DUP_VAL_ON_INDEX THEN
+    DBMS_OUTPUT.PUT_LINE('Error: Duplicate registration ID.');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+
+
+CREATE OR REPLACE TRIGGER trg_unique_student_id
+BEFORE INSERT OR UPDATE ON student_reg
+FOR EACH ROW
+DECLARE
+  v_count NUMBER;
+BEGIN
+  -- Check if the new student ID already exists in the table
+  SELECT COUNT(*) INTO v_count
+  FROM student_reg
+  WHERE stud_id = :NEW.stud_id;
+  
+  -- If the count is greater than 0, raise an exception
+  IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Error: Duplicate student ID');
+  END IF;
+END;
+/
+
+
+
+CREATE OR REPLACE TRIGGER trg_unique_student_id
+BEFORE INSERT OR UPDATE ON student_reg
+FOR EACH ROW
+DECLARE
+  v_count NUMBER;
+BEGIN
+  -- Check if the new student ID already exists in the table
+  SELECT COUNT(*) INTO v_count
+  FROM student_reg
+  WHERE stud_id = :NEW.stud_id;
+  
+  -- If the count is greater than 0, raise an exception
+  IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Error: Duplicate student ID');
+  END IF;
+END;
+/
+
+
+INSERT INTO student_reg (reg_id, reg_name, stud_id, staff_id)
+VALUES (1, 'John Doe', 1001, 2001);
+
+INSERT INTO student_reg (reg_id, reg_name, stud_id, staff_id)
+VALUES (2, 'Jane Smith', 1002, 2002);
+
+-- Declare a cursor to retrieve data from the student_reg table
+DECLARE
+  CURSOR c_student_reg IS
+    SELECT reg_id, reg_name, stud_id, staff_id
+    FROM student_reg;
+  
+  v_reg_id NUMBER(10);
+  v_reg_name VARCHAR(30);
+  v_stud_id NUMBER(10);
+  v_staff_id NUMBER(10);
+BEGIN
+  -- Open the cursor
+  OPEN c_student_reg;
+  
+  -- Fetch data from the cursor
+  LOOP
+    FETCH c_student_reg INTO v_reg_id, v_reg_name, v_stud_id, v_staff_id;
+    
+    -- Exit the loop if no more rows are found
+    EXIT WHEN c_student_reg%NOTFOUND;
+    
+    -- Process the fetched data
+    DBMS_OUTPUT.PUT_LINE('Registration ID: ' || v_reg_id);
+    DBMS_OUTPUT.PUT_LINE('Registration Name: ' || v_reg_name);
+    DBMS_OUTPUT.PUT_LINE('Student ID: ' || v_stud_id);
+    DBMS_OUTPUT.PUT_LINE('Staff ID: ' || v_staff_id);
+    DBMS_OUTPUT.PUT_LINE('------------------------------');
+  END LOOP;
+  
+  -- Close the cursor
+  CLOSE c_student_reg;
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+
+
+Subquery to retrieve students with a specific course:
+
+SELECT stud_id, stfname, stlname FROM student WHERE stcourse = (SELECT stcourse FROM student WHERE stfname = 'karen');
+This subquery retrieves the course of a specific student ('John Doe' in this example) and then finds all students who are enrolled in the same course.
+
+Subquery to retrieve students in a specific year:
+
+SELECT stud_id, stfname, stlname
+FROM student
+WHERE styear = (
+  SELECT MAX(styear)
+  FROM student
+);
+This subquery retrieves the maximum value of the "styear" column from the "student" table, and then finds all students who are in that year.
+
+Subquery to retrieve students who are older than a certain age:
+SELECT stud_id, stfname, stlname
+FROM student
+WHERE st_age > (
+  SELECT AVG(st_age)
+  FROM student
+);
+This subquery calculates the average value of the "st_age" column from the "student" table, and then finds all students whose age is greater than the average.
+
+
+
+
+
+Subquery to retrieve staff members with a specific gender:
+SELECT staff_id, fname, lname
+FROM staff
+WHERE gender = 'Female';
+This subquery retrieves all staff members who have a gender value of 'Female'.
+
+Subquery to retrieve staff members with a specific contact number:
+
+SELECT staff_id, fname, lname
+FROM staff
+WHERE contact = (
+  SELECT contact
+  FROM staff
+  WHERE fname = 'jeeva');
+This subquery retrieves the contact number of a specific staff member ('jeeva' in this example) and then finds all staff members who have the same contact number.
+
+Subquery to retrieve staff members with a specific address:
+
+SELECT staff_id, fname, lname
+FROM staff
+WHERE address = (
+  SELECT address
+  FROM staff
+  WHERE fname = 'jeba');
+This subquery retrieves the address of a specific staff member ('jeba' in this example) and then finds all staff members who have the same address.
+
+Subquery to retrieve staff members based on the number of characters in their first name:
+
+SELECT staff_id, fname, lname
+FROM staff
+WHERE LENGTH(fname) = (
+  SELECT MAX(LENGTH(fname))
+  FROM staff);
+
+SELECT COUNT(*) AS total_students
+FROM student
+WHERE stcourse = 'CSBS';
+> SELECT AVG(st_age) AS average_age
+    FROM student;
+SELECT MAX(styear) AS max_year
+FROM student;
+
+SELECT MIN(st_age) AS min_age
+FROM student;
+SELECT UPPER(stfname) AS uppercase_fname, UPPER(stlname) AS uppercase_lname
+FROM student;
+
+
+
+
